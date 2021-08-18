@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CP380_B2_BlockWebAPI.Models;
+using CP380_B1_BlockList.Models;
 
 namespace CP380_B2_BlockWebAPI.Controllers
 {
@@ -14,43 +15,62 @@ namespace CP380_B2_BlockWebAPI.Controllers
     public class BlocksController : ControllerBase
     {
         // TODO
-        private readonly PendingPayloads _db;
-        private readonly BlockSummaryList _today;
-
-        public BlocksController(PendingPayloads dbContext, BlockSummaryList blockSummaryList)
+        private readonly BlockList block_list;
+        public BlocksController(BlockList blockList )
         {
-            _db = dbContext;
-            _today = blockSummaryList;
+            block_list = blockList;
         }
 
-        [HttpGet]
-
-        public ActionResult<List<BlockSummary>> Get() =>
-            _db.blockSummaries.Select(a => new BlockSummary() { DateTime = a.DateTime, Id = a.Id})
-            .ToList();
-
-        [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(NotFoundResult))]
-
-        public ActionResult<BlockSummary> GetBlockSummary(int id)
+        [HttpGet("/blocks")]
+        public ActionResult Get()
         {
-            var blocksummary = _db.blockSummaries.Where(a => a.Id == id).FirstOrDefault();
-            if (blocksummary == null)
+            return Ok(block_list.Chain.Select(b => new BlockSummary()
             {
-                return NotFound();
-            }
-            return blocksummary;
-
+                Hash = b.Hash,
+                PreviousHash = b.PreviousHash,
+                TimeStamp = b.TimeStamp
+            }));
         }
 
-        [HttpPost]
-        public ActionResult<BlockSummary> Post(BlockSummary value)
+        [HttpGet("/blocks/{hash?}")]
+        public ActionResult GetBlockhash(string hash)
         {
-            _db.blockSummaries.Add(value);
-            return CreatedAtAction(nameof(BlockSummary), value);
+            var block = block_list.Chain
+                .Where(block => block.Hash.Equals(hash));
+
+            if (block != null && block.Count() > 0)
+            {
+                return Ok(block
+                    .Select(b => new BlockSummary()
+                    {
+                    Hash = b.Hash,
+                PreviousHash = b.PreviousHash,
+                TimeStamp = b.TimeStamp
+                        }
+                )
+                .First());
+            }
+            return NotFound();
+        }
+
+        [HttpGet("/blocks/{hash?}/payloads")]
+
+        public IActionResult GetBlockPayload(string hash)
+        {
+            var block = block_list.Chain
+                .Where(b => b.Hash.Equals(hash));
+
+            if (block != null && block.Count() > 0)
+            {
+                return Ok(block
+                    .Select(b => b.Data
+                    )
+                    .First());
+            }
+            return NotFound();
         }
             
 
     }
 }
+ 

@@ -8,26 +8,26 @@ namespace CP380_B2_BlockWebAPI.Models
     public class BlockSummary
     {
         // TODO
-        public int Id { get; set; }
-        public DateTime DateTime { get; set; }
+
+        public DateTime Timedate { get; set; }
+        public string PreviousHash { get; set; }
+        public string Hash { get; set; }
+        public DateTime TimeStamp { get; set; }
+
+        public BlockSummary(DateTime TimeStamp, string PreviousHash, string Hash)
+        {
+            this.Timedate = TimeStamp;
+            this.PreviousHash = PreviousHash;
+            this.Hash = Hash;
+        }
+        public BlockSummary()
+        {
+
+        }
+
+
+
+
     }
-
-    public class Block: BlockSummary
-    {
-        public string Description { get; set; }
-
-        public List<Block> Blocks { get; set; }
-
-    }
-    public class BlockSummaryList 
-    {
-
-        public List<BlockSummary> blockSummaries { get; set; }
-    }
-
-
-
-
-
 }
 
