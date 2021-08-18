@@ -12,6 +12,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.IO;
+using CP380_B2_BlockWebAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CP380_B2_BlockWebAPI
 {
@@ -31,6 +33,8 @@ namespace CP380_B2_BlockWebAPI
             // TODO:
             //  add singletons
             //  
+            services.AddSingleton<BlockSummaryList>();
+            services.AddDbContext<PendingPayloads>(options => options.UseInMemoryDatabase("pendingpayloads"));
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
